@@ -23,17 +23,17 @@ struct Tire{
     for(int i=0;i<Ticks;i++){
     slipupdate();
     heatupdate();
+    pressure_update();
     }
     grip_update();
-    pressure_update();
     wearupdate();
-    display();
+    //display();
   }
   void display(){
     cout<<"\n";
-  cout<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+  cout<<"***************************\n";
   cout<<"\tTire Telemetry\n";
-  cout<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+  cout<<"***************************\n";
   cout<<"Tire Pressure: "<<pressure<<"psi\n";
   cout<<"Temperature: "<<temp-273.1<<"C\n";
   cout<<"Tire Grip: "<<grip<<"\n";
@@ -44,7 +44,9 @@ struct Tire{
     wear+=slip*temp*0.0002;
   }
   void heatupdate(){
-    float heat=(slip*throttle*150.0f)+303.15f;
+    float load_heat=(speed/200.0)*50.0f;
+    float slip_heat=slip*throttle*150.0f;
+    float heat=311.15f+slip_heat+load_heat;
     temp+=(heat-temp)*0.1f;
   }
   void slipupdate(){
@@ -79,11 +81,23 @@ struct Tire{
     else
       grip = "OverHeating";
   }
+  float find_initial_psi(float targetpsi){
+    float lowpsi=20,highpsi=targetpsi;
+    for(int i=0;i<50;i++){
+      float mid=(highpsi+lowpsi)/2.0f;
+      pressure=p0=mid;
+      temp=t0;
+      update();
+      if(pressure<targetpsi)lowpsi=mid;
+      else highpsi=mid;
+    }
+    return (lowpsi+highpsi)/2.0f;
+  }
 };
 
 
-
 int main(){
+  float perfectpsi;
   int ticks;
   cout<<"***************************\n";
   cout<<"\tTire Anatomy\n";
@@ -93,7 +107,14 @@ int main(){
   Tire mazda(ticks);
   mazda.getdata();
   mazda.update();
-  
+  mazda.display();
+  cout<<"***************************\n";
+  cout<<"Perfect Pressure\n";
+  cout<<"***************************\n";
+  cout<<"Enter the Tire's Recommended psi: ";
+  cin>>perfectpsi;
+  cout<<"The Suggested Initial Pressure(psi): "<<mazda.find_initial_psi(perfectpsi)<<"\n";
+
   
 
   
