@@ -5,4 +5,4 @@ the solver wil suggest you the perfect tire pressure to start your journey
 ## How to Install
 1. Clone the git
 2. compile the `tire.cpp` and run
-3. and voila!!!
+3. Voila!!!
